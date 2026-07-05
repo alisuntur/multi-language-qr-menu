@@ -1,0 +1,6 @@
+@MultiLanguageQrMenu.Api_HostAddress = http://localhost:5108
+
+GET {{MultiLanguageQrMenu.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
