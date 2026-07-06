@@ -59,6 +59,8 @@ builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<RestaurantService>();
 builder.Services.AddSingleton<MenuCategoryService>();
 builder.Services.AddSingleton<MenuItemService>();
+builder.Services.AddSingleton<LanguageService>();
+builder.Services.AddSingleton<PublicMenuService>();
 builder.Services.AddSingleton<DatabaseBootstrapper>();
 
 var app = builder.Build();
@@ -174,6 +176,7 @@ app.MapPut("/api/restaurants/current", async (UpdateRestaurantRequest request, C
 }).RequireAuthorization();
 
 app.MapMenuManagementEndpoints();
+app.MapPublicMenuEndpoints();
 app.Run();
 
 static List<string> ValidateModel<T>(T model)
@@ -1086,6 +1089,7 @@ static class ApiResponse
         Errors = errors
     };
 }
+
 
 
 

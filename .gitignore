@@ -1,4 +1,4 @@
-﻿bin/
+bin/
 obj/
 .vs/
 .vscode/
@@ -12,3 +12,5 @@ coverage/
 .runlogs/
 
 *.tsbuildinfo
+docs/
+

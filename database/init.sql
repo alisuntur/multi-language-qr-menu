@@ -1,4 +1,4 @@
-﻿CREATE TABLE IF NOT EXISTS restaurants (
+CREATE TABLE IF NOT EXISTS restaurants (
     id uuid PRIMARY KEY,
     name varchar(200) NOT NULL,
     slug varchar(200) NOT NULL UNIQUE,
@@ -117,6 +117,29 @@ CREATE TABLE IF NOT EXISTS menu_item_translations (
     PRIMARY KEY (menu_item_id, language_code)
 );
 
+CREATE TABLE IF NOT EXISTS languages (
+    code varchar(8) PRIMARY KEY,
+    name varchar(80) NOT NULL,
+    is_active boolean NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE IF NOT EXISTS restaurant_languages (
+    restaurant_id uuid NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+    language_code varchar(8) NOT NULL REFERENCES languages(code) ON DELETE CASCADE,
+    is_enabled boolean NOT NULL DEFAULT TRUE,
+    PRIMARY KEY (restaurant_id, language_code)
+);
+
+INSERT INTO languages (code, name, is_active)
+VALUES
+    ('tr', 'Turkce', TRUE),
+    ('en', 'English', TRUE),
+    ('de', 'Deutsch', TRUE),
+    ('ru', 'Russkiy', TRUE)
+ON CONFLICT (code) DO UPDATE SET
+    name = EXCLUDED.name,
+    is_active = EXCLUDED.is_active;
+
 CREATE INDEX IF NOT EXISTS ix_users_restaurant_id ON users (restaurant_id);
 CREATE INDEX IF NOT EXISTS ix_refresh_tokens_user_id ON refresh_tokens (user_id);
 CREATE INDEX IF NOT EXISTS ix_refresh_tokens_token_hash ON refresh_tokens (token_hash);
@@ -125,3 +148,5 @@ CREATE INDEX IF NOT EXISTS ix_menu_categories_restaurant_sort_order ON menu_cate
 CREATE INDEX IF NOT EXISTS ix_menu_categories_restaurant_is_active ON menu_categories (restaurant_id, is_active);
 CREATE INDEX IF NOT EXISTS ix_menu_items_restaurant_category_sort_order ON menu_items (restaurant_id, category_id, sort_order);
 CREATE INDEX IF NOT EXISTS ix_menu_items_restaurant_is_active ON menu_items (restaurant_id, is_active);
+CREATE INDEX IF NOT EXISTS ix_restaurant_languages_restaurant_enabled ON restaurant_languages (restaurant_id, is_enabled);
+
