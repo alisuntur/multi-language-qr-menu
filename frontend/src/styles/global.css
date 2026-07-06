@@ -256,3 +256,112 @@ label {
     grid-template-columns: 1fr;
   }
 }
+
+select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  background: var(--surface-strong);
+}
+
+.management-shell {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.95fr) minmax(0, 1.05fr);
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.management-list {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.list-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.list-card.active {
+  border-color: rgba(138, 75, 42, 0.4);
+  background: rgba(138, 75, 42, 0.08);
+}
+
+.list-card h4 {
+  margin: 0 0 0.35rem;
+}
+
+.inline-badges,
+.row-actions,
+.checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.row-actions {
+  justify-content: flex-end;
+}
+
+.tiny-button {
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  color: var(--text);
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.tiny-button.danger {
+  color: #a93636;
+}
+
+.translation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.translation-card {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.55);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.two-column-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.checkbox-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.checkbox-row input {
+  width: auto;
+}
+
+@media (max-width: 1100px) {
+  .management-shell,
+  .translation-grid,
+  .two-column-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .list-card {
+    flex-direction: column;
+  }
+}

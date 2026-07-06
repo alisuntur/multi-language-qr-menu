@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
@@ -13,6 +14,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
     .AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json"), optional: true, reloadOnChange: false)
     .AddJsonFile(Path.Combine(AppContext.BaseDirectory, $"appsettings.{builder.Environment.EnvironmentName}.json"), optional: true, reloadOnChange: false);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSimpleConsole(options =>
+{
+    options.SingleLine = true;
+    options.TimestampFormat = "HH:mm:ss ";
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -49,6 +57,8 @@ builder.Services.AddSingleton<PasswordHasher>();
 builder.Services.AddSingleton<JwtTokenService>();
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<RestaurantService>();
+builder.Services.AddSingleton<MenuCategoryService>();
+builder.Services.AddSingleton<MenuItemService>();
 builder.Services.AddSingleton<DatabaseBootstrapper>();
 
 var app = builder.Build();
@@ -163,6 +173,7 @@ app.MapPut("/api/restaurants/current", async (UpdateRestaurantRequest request, C
     return Results.Ok(ApiResponse.Ok(restaurant, "Restaurant settings updated."));
 }).RequireAuthorization();
 
+app.MapMenuManagementEndpoints();
 app.Run();
 
 static List<string> ValidateModel<T>(T model)
@@ -1075,6 +1086,11 @@ static class ApiResponse
         Errors = errors
     };
 }
+
+
+
+
+
 
 
 

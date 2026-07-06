@@ -58,7 +58,70 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     created_at timestamptz NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS menu_categories (
+    id uuid PRIMARY KEY,
+    restaurant_id uuid NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+    name varchar(200) NOT NULL,
+    slug varchar(200) NOT NULL,
+    description text NOT NULL DEFAULT '',
+    image_url varchar(512) NOT NULL DEFAULT '',
+    sort_order integer NOT NULL DEFAULT 0,
+    is_active boolean NOT NULL DEFAULT TRUE,
+    created_at timestamptz NOT NULL DEFAULT NOW(),
+    updated_at timestamptz NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_menu_categories_restaurant_slug UNIQUE (restaurant_id, slug)
+);
+
+CREATE TABLE IF NOT EXISTS menu_category_translations (
+    category_id uuid NOT NULL REFERENCES menu_categories(id) ON DELETE CASCADE,
+    language_code varchar(8) NOT NULL,
+    name varchar(200) NOT NULL,
+    description text NOT NULL DEFAULT '',
+    PRIMARY KEY (category_id, language_code)
+);
+
+CREATE TABLE IF NOT EXISTS menu_items (
+    id uuid PRIMARY KEY,
+    restaurant_id uuid NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+    category_id uuid NOT NULL REFERENCES menu_categories(id) ON DELETE CASCADE,
+    name varchar(200) NOT NULL,
+    slug varchar(200) NOT NULL,
+    description text NOT NULL DEFAULT '',
+    price numeric(12,2) NOT NULL,
+    discounted_price numeric(12,2) NULL,
+    currency varchar(8) NOT NULL DEFAULT 'TRY',
+    image_url varchar(512) NOT NULL DEFAULT '',
+    preparation_time_minutes integer NULL,
+    calories integer NULL,
+    spice_level integer NOT NULL DEFAULT 0,
+    is_vegetarian boolean NOT NULL DEFAULT FALSE,
+    is_vegan boolean NOT NULL DEFAULT FALSE,
+    is_gluten_free boolean NOT NULL DEFAULT FALSE,
+    is_featured boolean NOT NULL DEFAULT FALSE,
+    is_available boolean NOT NULL DEFAULT TRUE,
+    is_active boolean NOT NULL DEFAULT TRUE,
+    sort_order integer NOT NULL DEFAULT 0,
+    created_at timestamptz NOT NULL DEFAULT NOW(),
+    updated_at timestamptz NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_menu_items_restaurant_slug UNIQUE (restaurant_id, slug),
+    CONSTRAINT chk_menu_items_price CHECK (price >= 0),
+    CONSTRAINT chk_menu_items_discounted_price CHECK (discounted_price IS NULL OR (discounted_price >= 0 AND discounted_price <= price)),
+    CONSTRAINT chk_menu_items_spice_level CHECK (spice_level >= 0 AND spice_level <= 5)
+);
+
+CREATE TABLE IF NOT EXISTS menu_item_translations (
+    menu_item_id uuid NOT NULL REFERENCES menu_items(id) ON DELETE CASCADE,
+    language_code varchar(8) NOT NULL,
+    name varchar(200) NOT NULL,
+    description text NOT NULL DEFAULT '',
+    PRIMARY KEY (menu_item_id, language_code)
+);
+
 CREATE INDEX IF NOT EXISTS ix_users_restaurant_id ON users (restaurant_id);
 CREATE INDEX IF NOT EXISTS ix_refresh_tokens_user_id ON refresh_tokens (user_id);
 CREATE INDEX IF NOT EXISTS ix_refresh_tokens_token_hash ON refresh_tokens (token_hash);
 CREATE INDEX IF NOT EXISTS ix_audit_logs_restaurant_id_created_at ON audit_logs (restaurant_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS ix_menu_categories_restaurant_sort_order ON menu_categories (restaurant_id, sort_order);
+CREATE INDEX IF NOT EXISTS ix_menu_categories_restaurant_is_active ON menu_categories (restaurant_id, is_active);
+CREATE INDEX IF NOT EXISTS ix_menu_items_restaurant_category_sort_order ON menu_items (restaurant_id, category_id, sort_order);
+CREATE INDEX IF NOT EXISTS ix_menu_items_restaurant_is_active ON menu_items (restaurant_id, is_active);
