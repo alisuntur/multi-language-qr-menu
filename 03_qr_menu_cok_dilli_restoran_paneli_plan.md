@@ -34,7 +34,7 @@ Bu proje restoran, kafe, beach club, otel restoranı ve benzeri işletmelerin me
 | Backend | ASP.NET Core Web API veya FastAPI | Basit SaaS API yapısı |
 | Veritabanı | PostgreSQL / Supabase PostgreSQL | Restoran bazlı veri izolasyonu |
 | Auth | JWT + Refresh Token | Panel için gerekli |
-| Dosya | Supabase Storage / S3 | Logo, ürün görseli, kapak görseli |
+| Dosya | Assets dizininde | Logo, ürün görseli, kapak görseli |
 | QR/PDF | Backend veya frontend PDF üretimi | Masa bazlı QR çıktısı |
 | Analitik | Anonim event kayıtları | Kişisel veri toplamadan basit istatistik |
 
