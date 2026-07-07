@@ -130,6 +130,50 @@ CREATE TABLE IF NOT EXISTS restaurant_languages (
     PRIMARY KEY (restaurant_id, language_code)
 );
 
+CREATE TABLE IF NOT EXISTS restaurant_tables (
+    id uuid PRIMARY KEY,
+    restaurant_id uuid NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+    table_number integer NOT NULL,
+    table_name varchar(120) NOT NULL DEFAULT '',
+    qr_token varchar(128) NOT NULL,
+    is_active boolean NOT NULL DEFAULT TRUE,
+    created_at timestamptz NOT NULL DEFAULT NOW(),
+    updated_at timestamptz NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_restaurant_tables_restaurant_number UNIQUE (restaurant_id, table_number),
+    CONSTRAINT uq_restaurant_tables_qr_token UNIQUE (qr_token)
+);
+
+CREATE TABLE IF NOT EXISTS qr_codes (
+    id uuid PRIMARY KEY,
+    restaurant_id uuid NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+    table_id uuid NULL REFERENCES restaurant_tables(id) ON DELETE CASCADE,
+    type varchar(32) NOT NULL,
+    token varchar(128) NOT NULL UNIQUE,
+    target_url varchar(1024) NOT NULL,
+    is_active boolean NOT NULL DEFAULT TRUE,
+    revoked_at timestamptz NULL,
+    created_at timestamptz NOT NULL DEFAULT NOW(),
+    updated_at timestamptz NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS restaurant_theme_settings (
+    restaurant_id uuid PRIMARY KEY REFERENCES restaurants(id) ON DELETE CASCADE,
+    logo_url varchar(512) NOT NULL DEFAULT '',
+    cover_image_url varchar(512) NOT NULL DEFAULT '',
+    primary_color varchar(7) NOT NULL DEFAULT '#ff6b35',
+    secondary_color varchar(7) NOT NULL DEFAULT '#132238',
+    font_family varchar(120) NOT NULL DEFAULT 'Manrope',
+    menu_layout varchar(16) NOT NULL DEFAULT 'cards',
+    show_whatsapp_button boolean NOT NULL DEFAULT TRUE,
+    show_google_review_button boolean NOT NULL DEFAULT FALSE,
+    google_review_url varchar(512) NOT NULL DEFAULT '',
+    created_at timestamptz NOT NULL DEFAULT NOW(),
+    updated_at timestamptz NOT NULL DEFAULT NOW(),
+    CONSTRAINT chk_restaurant_theme_menu_layout CHECK (menu_layout IN ('cards', 'list')),
+    CONSTRAINT chk_restaurant_theme_primary_color CHECK (primary_color ~ '^#[0-9A-Fa-f]{6}$'),
+    CONSTRAINT chk_restaurant_theme_secondary_color CHECK (secondary_color ~ '^#[0-9A-Fa-f]{6}$')
+);
+
 INSERT INTO languages (code, name, is_active)
 VALUES
     ('tr', 'Turkce', TRUE),
@@ -149,4 +193,6 @@ CREATE INDEX IF NOT EXISTS ix_menu_categories_restaurant_is_active ON menu_categ
 CREATE INDEX IF NOT EXISTS ix_menu_items_restaurant_category_sort_order ON menu_items (restaurant_id, category_id, sort_order);
 CREATE INDEX IF NOT EXISTS ix_menu_items_restaurant_is_active ON menu_items (restaurant_id, is_active);
 CREATE INDEX IF NOT EXISTS ix_restaurant_languages_restaurant_enabled ON restaurant_languages (restaurant_id, is_enabled);
-
+CREATE INDEX IF NOT EXISTS ix_restaurant_tables_restaurant_number ON restaurant_tables (restaurant_id, table_number);
+CREATE INDEX IF NOT EXISTS ix_qr_codes_restaurant_type_active ON qr_codes (restaurant_id, type, is_active);
+CREATE INDEX IF NOT EXISTS ix_qr_codes_table_id ON qr_codes (table_id);

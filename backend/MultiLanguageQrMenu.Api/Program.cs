@@ -60,6 +60,9 @@ builder.Services.AddSingleton<RestaurantService>();
 builder.Services.AddSingleton<MenuCategoryService>();
 builder.Services.AddSingleton<MenuItemService>();
 builder.Services.AddSingleton<LanguageService>();
+builder.Services.AddSingleton<QrCodeService>();
+builder.Services.AddSingleton<TableService>();
+builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddSingleton<PublicMenuService>();
 builder.Services.AddSingleton<DatabaseBootstrapper>();
 
@@ -176,7 +179,9 @@ app.MapPut("/api/restaurants/current", async (UpdateRestaurantRequest request, C
 }).RequireAuthorization();
 
 app.MapMenuManagementEndpoints();
+app.MapQrManagementEndpoints();
 app.MapPublicMenuEndpoints();
+app.MapThemeManagementEndpoints();
 app.Run();
 
 static List<string> ValidateModel<T>(T model)
